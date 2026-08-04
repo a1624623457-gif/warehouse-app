@@ -8,6 +8,12 @@ function initDB() {
   const sqlite = new Database(DB_PATH);
   sqlite.pragma("journal_mode = WAL");
   sqlite.pragma("foreign_keys = ON");
+  sqlite.pragma("busy_timeout = 5000");
+
+  // Enable WAL checkpoint on close
+  process.on("exit", () => {
+    try { sqlite.close(); } catch {}
+  });
 
   // Create tables
   sqlite.exec(`
