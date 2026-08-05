@@ -45,11 +45,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.username = (user as any).username;
         token.role = (user as any).role;
 
-        // Update last login time
+        // Update last login time and generate a session token for single-device enforcement
         const db = getDb();
+        const sessionToken = `sess_${Date.now()}_${Math.random().toString(36).slice(2)}`;
         db.prepare(
-          "UPDATE users SET last_login_at = datetime('now'), last_login_ip = ? WHERE id = ?"
-        ).run(null, user.id);
+          "UPDATE users SET last_login_at = datetime('now'), last_login_ip = ?, session_token = ? WHERE id = ?"
+        ).run(null, sessionToken, user.id);
+        token.sessionToken = sessionToken;
       }
       return token;
     },
@@ -58,6 +60,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         (session.user as any).id = token.id;
         (session.user as any).username = token.username;
         (session.user as any).role = token.role;
+        (session.user as any).sessionToken = token.sessionToken;
       }
       return session;
     },

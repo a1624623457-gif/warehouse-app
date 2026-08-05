@@ -64,6 +64,7 @@ export async function PUT(
         {
           error: "PRODUCT_LOCKED",
           message: `产品正在由 ${lockedByUser?.display_name || "其他用户"} 编辑中，请稍后再试。`,
+          lockedBy: lockedByUser?.display_name || "其他用户",
         },
         { status: 409 }
       );

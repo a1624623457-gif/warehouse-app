@@ -26,6 +26,7 @@ function initDB() {
       is_active INTEGER NOT NULL DEFAULT 1,
       last_login_ip TEXT,
       last_login_at TEXT,
+      session_token TEXT,
       created_at TEXT DEFAULT (datetime('now')),
       updated_at TEXT DEFAULT (datetime('now'))
     );
