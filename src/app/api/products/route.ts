@@ -47,6 +47,17 @@ export async function GET(req: NextRequest) {
           ORDER BY p.updated_at DESC
           LIMIT ? OFFSET ?
         `).all(limit, (page - 1) * limit);
+      } else if (zone.name === "零库存") {
+        rows = db.prepare(`
+          SELECT p.*, z.name as zoneName, s.label as specTypeLabel, sh.name as shelfName
+          FROM products p
+          LEFT JOIN zones z ON p.zone_id = z.id
+          LEFT JOIN spec_types s ON p.spec_type_id = s.id
+          LEFT JOIN shelves sh ON p.shelf_id = sh.id
+          WHERE p.current_stock <= 0
+          ORDER BY p.updated_at DESC
+          LIMIT ? OFFSET ?
+        `).all(limit, (page - 1) * limit);
       } else {
         rows = [];
       }
@@ -58,7 +69,7 @@ export async function GET(req: NextRequest) {
         LEFT JOIN zones z ON p.zone_id = z.id
         LEFT JOIN spec_types s ON p.spec_type_id = s.id
         LEFT JOIN shelves sh ON p.shelf_id = sh.id
-        WHERE p.zone_id = ? AND p.shelf_id = ?
+        WHERE p.zone_id = ? AND p.shelf_id = ? AND p.current_stock > 0
         ORDER BY p.updated_at DESC
         LIMIT ? OFFSET ?
       `).all(parseInt(zoneId), parseInt(shelfId), limit, (page - 1) * limit);
@@ -69,7 +80,7 @@ export async function GET(req: NextRequest) {
         LEFT JOIN zones z ON p.zone_id = z.id
         LEFT JOIN spec_types s ON p.spec_type_id = s.id
         LEFT JOIN shelves sh ON p.shelf_id = sh.id
-        WHERE p.zone_id = ?
+        WHERE p.zone_id = ? AND p.current_stock > 0
         ORDER BY p.updated_at DESC
         LIMIT ? OFFSET ?
       `).all(parseInt(zoneId), limit, (page - 1) * limit);
@@ -108,8 +119,8 @@ export async function POST(req: NextRequest) {
   }
 
   const role = (session.user as any).role;
-  if (role !== "admin" && role !== "editor") {
-    return NextResponse.json({ error: "无权限" }, { status: 403 });
+  if (role !== "admin") {
+    return NextResponse.json({ error: "仅管理员可新增产品" }, { status: 403 });
   }
 
   const body = await req.json();

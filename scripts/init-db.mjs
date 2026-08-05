@@ -25,6 +25,7 @@ function initDB() {
       display_name TEXT NOT NULL,
       is_active INTEGER NOT NULL DEFAULT 1,
       last_login_ip TEXT,
+      last_login_at TEXT,
       created_at TEXT DEFAULT (datetime('now')),
       updated_at TEXT DEFAULT (datetime('now'))
     );
@@ -139,6 +140,7 @@ function initDB() {
       ["B", 0, 0, 2],
       ["C", 0, 0, 3],
       ["D", 0, 0, 4],
+      ["零库存", 1, 1, 96],
       ["临期", 1, 1, 98],
       ["过期", 1, 1, 99],
     ];

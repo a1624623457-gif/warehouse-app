@@ -247,11 +247,19 @@ function ZoneProductsContent() {
             共 {products.length} 个产品
           </p>
         </div>
-        {canEdit && !zone?.isVirtual && (
+        {isAdmin && !zone?.isVirtual && (
           <Button onClick={handleAdd} size="md">
             <Plus size={18} className="mr-1" />
             添加产品
           </Button>
+        )}
+        {role === "editor" && !zone?.isVirtual && (
+          <span className="text-sm text-gray-400 italic">编辑者可修改产品</span>
+        )}
+        {zone?.isVirtual && (
+          <div className="text-sm text-gray-400 italic">
+            {zone.name === "零库存" ? "库存为0的产品自动归入此区域" : "系统自动归类"}
+          </div>
         )}
       </div>
 
@@ -287,7 +295,7 @@ function ZoneProductsContent() {
           <Package size={64} className="mb-4" />
           <p className="text-lg font-medium">暂无产品</p>
           <p className="text-sm mt-1">
-            {canEdit ? '点击右上角"添加产品"按钮' : "暂无产品数据"}
+            {isAdmin ? '点击右上角"添加产品"按钮' : "暂无产品数据"}
           </p>
         </div>
       ) : (
@@ -298,6 +306,7 @@ function ZoneProductsContent() {
                 product={product}
                 onClick={() => handleCardClick(product)}
                 highlighted={highlightedId === product.id.toString()}
+                showPrice={isAdmin}
               />
             </div>
           ))}
@@ -309,7 +318,7 @@ function ZoneProductsContent() {
         onOpenChange={setDetailOpen}
         product={selectedProduct}
         onEdit={handleEdit}
-        onDelete={handleDelete}
+        onDelete={isAdmin ? handleDelete : undefined}
         canEdit={canEdit}
         isAdmin={isAdmin}
       />

@@ -274,15 +274,13 @@ export function ProductForm({
               />
             </div>
 
-            {/* Model input */}
+            {/* Product category (model) */}
             <div>
-              <Label>型号</Label>
-              <input
-                type="text"
+              <Label>产品类别</Label>
+              <CategoryInput
                 value={form.model}
-                onChange={(e) => updateField("model", e.target.value)}
-                placeholder="如：30ml、50g、S/M/L、件、箱、袋..."
-                className="w-full h-10 rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                onChange={(val) => updateField("model", val)}
+                placeholder="如：美妆类、服装类、日化类..."
               />
             </div>
 
@@ -299,14 +297,14 @@ export function ProductForm({
 
             {/* Unit price */}
             <div>
-              <Label>单价 (元)</Label>
+              <Label>成本价 (元)</Label>
               <input
                 type="number"
                 step="0.01"
                 min="0"
                 value={form.unitPrice}
                 onChange={(e) => updateField("unitPrice", e.target.value)}
-                placeholder="请输入单价"
+                placeholder="请输入成本价"
                 className="w-full h-10 rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -432,6 +430,91 @@ export function ProductForm({
           </Button>
         </div>
       </div>
+    </div>
+  );
+}
+
+// Simple category input with history quick-select
+function CategoryInput({
+  value,
+  onChange,
+  placeholder,
+}: {
+  value: string;
+  onChange: (val: string) => void;
+  placeholder: string;
+}) {
+  const [history, setHistory] = useState<string[]>([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [filteredHistory, setFilteredHistory] = useState<string[]>([]);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    // Fetch distinct categories from existing products
+    fetch("/api/products/categories")
+      .then((r) => r.json())
+      .then((data) => setHistory(data || []))
+      .catch(() => {});
+  }, []);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const handleInputChange = (val: string) => {
+    onChange(val);
+    if (val.trim()) {
+      const filtered = history.filter((h) =>
+        h.toLowerCase().includes(val.toLowerCase())
+      );
+      setFilteredHistory(filtered);
+      setShowDropdown(filtered.length > 0);
+    } else {
+      setShowDropdown(false);
+    }
+  };
+
+  return (
+    <div ref={containerRef} className="relative">
+      <input
+        ref={inputRef}
+        type="text"
+        value={value}
+        onChange={(e) => handleInputChange(e.target.value)}
+        onFocus={() => {
+          if (!value.trim() && history.length > 0) {
+            setFilteredHistory(history);
+            setShowDropdown(true);
+          }
+        }}
+        placeholder={placeholder}
+        className="w-full h-10 rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+      {showDropdown && filteredHistory.length > 0 && (
+        <div className="absolute z-50 top-full mt-1 w-full bg-white rounded-lg shadow-lg border border-gray-200 max-h-40 overflow-auto">
+          {filteredHistory.map((cat) => (
+            <button
+              key={cat}
+              type="button"
+              onClick={() => {
+                onChange(cat);
+                setShowDropdown(false);
+              }}
+              className="w-full px-3 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 text-left"
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

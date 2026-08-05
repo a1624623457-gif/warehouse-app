@@ -39,6 +39,7 @@ export function Sidebar({ zones, onZoneAdded }: SidebarProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const isAdmin = (session?.user as any)?.role === "admin";
+  const isEditor = (session?.user as any)?.role === "editor";
 
   const realZones = (zones || []).filter((z) => !z.isVirtual);
   const virtualZones = (zones || []).filter((z) => z.isVirtual);
@@ -79,30 +80,37 @@ export function Sidebar({ zones, onZoneAdded }: SidebarProps) {
 
         {/* Virtual zones */}
         <div className="px-3 py-2 mt-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-          临期 / 过期
+          系统区域
         </div>
-        {virtualZones.map((zone) => (
-          <button
-            key={zone.id}
-            onClick={() => navigateTo(`/zone/${zone.id}`)}
-            className={cn(
-              "w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors",
-              pathname === `/zone/${zone.id}`
-                ? "bg-blue-50 text-blue-700 font-medium border-r-2 border-blue-600"
-                : "text-gray-700 hover:bg-gray-100"
-            )}
-          >
-            {zone.name === "临期" ? (
-              <Clock size={16} className="text-amber-500" />
-            ) : (
-              <AlertTriangle size={16} className="text-red-500" />
-            )}
-            <span>{zone.name}</span>
-          </button>
-        ))}
+        {virtualZones.map((zone) => {
+          let iconColor = "text-gray-400";
+          let Icon = MapPin;
+          if (zone.name === "临期") {
+            Icon = Clock; iconColor = "text-amber-500";
+          } else if (zone.name === "过期") {
+            Icon = AlertTriangle; iconColor = "text-red-500";
+          } else if (zone.name === "零库存") {
+            Icon = Package; iconColor = "text-gray-400";
+          }
+          return (
+            <button
+              key={zone.id}
+              onClick={() => navigateTo(`/zone/${zone.id}`)}
+              className={cn(
+                "w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors",
+                pathname === `/zone/${zone.id}`
+                  ? "bg-blue-50 text-blue-700 font-medium border-r-2 border-blue-600"
+                  : "text-gray-700 hover:bg-gray-100"
+              )}
+            >
+              <Icon size={16} className={iconColor} />
+              <span>{zone.name}</span>
+            </button>
+          );
+        })}
 
         {/* Add zone button */}
-        {isAdmin && (
+        {(isAdmin || isEditor) && (
           <button
             onClick={() => navigateTo("/admin/zones")}
             className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-500 hover:bg-gray-100 transition-colors mt-2"
@@ -159,9 +167,7 @@ export function Sidebar({ zones, onZoneAdded }: SidebarProps) {
             <p className="text-xs text-gray-500">
               {(session?.user as any)?.role === "admin"
                 ? "管理员"
-                : (session?.user as any)?.role === "editor"
-                ? "编辑者"
-                : "查看者"}
+                : "编辑者"}
             </p>
           </div>
         </div>

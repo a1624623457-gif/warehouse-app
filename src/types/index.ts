@@ -1,7 +1,7 @@
 export interface User {
   id: number;
   username: string;
-  role: "admin" | "editor" | "viewer";
+  role: "admin" | "editor";
   displayName: string;
   isActive: number;
 }

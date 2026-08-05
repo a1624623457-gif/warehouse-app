@@ -11,6 +11,7 @@ export const users = sqliteTable("users", {
   displayName: text("display_name").notNull(),
   isActive: integer("is_active").notNull().default(1),
   lastLoginIp: text("last_login_ip"),
+  lastLoginAt: text("last_login_at"),
   createdAt: text("created_at").default(sql`(datetime('now'))`),
   updatedAt: text("updated_at").default(sql`(datetime('now'))`),
 });

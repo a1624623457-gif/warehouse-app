@@ -12,12 +12,14 @@ interface ProductCardProps {
     currentStock: number;
     shelfName?: string;
     zoneName?: string;
+    unitPrice?: number | null;
   };
   onClick: () => void;
   highlighted?: boolean;
+  showPrice?: boolean;
 }
 
-export function ProductCard({ product, onClick, highlighted }: ProductCardProps) {
+export function ProductCard({ product, onClick, highlighted, showPrice }: ProductCardProps) {
   return (
     <button
       onClick={onClick}
@@ -46,7 +48,9 @@ export function ProductCard({ product, onClick, highlighted }: ProductCardProps)
       <h3 className="font-medium text-gray-900 text-sm truncate">
         {product.name}
       </h3>
-      <p className="text-xs text-gray-500 mt-1 truncate">{product.model}</p>
+      <p className="text-xs text-gray-500 mt-1 truncate">
+        {product.model || "未分类"}
+      </p>
 
       {/* Shelf info - always show zone name even without specific shelf */}
       <p className="text-xs text-blue-600 mt-0.5 font-medium min-h-[1rem]">

@@ -44,6 +44,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.id = user.id;
         token.username = (user as any).username;
         token.role = (user as any).role;
+
+        // Update last login time
+        const db = getDb();
+        db.prepare(
+          "UPDATE users SET last_login_at = datetime('now'), last_login_ip = ? WHERE id = ?"
+        ).run(null, user.id);
       }
       return token;
     },

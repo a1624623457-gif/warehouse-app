@@ -9,7 +9,7 @@ export const createUserSchema = z.object({
   username: z.string().min(2, "用户名至少2个字符"),
   password: z.string().min(4, "密码至少4个字符"),
   displayName: z.string().min(1, "请输入显示名称"),
-  role: z.enum(["admin", "editor", "viewer"]),
+  role: z.enum(["admin", "editor"]),
 });
 
 export const productSchema = z.object({

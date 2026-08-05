@@ -24,6 +24,7 @@ interface User {
   displayName: string;
   isActive: number;
   createdAt: string;
+  lastLoginAt: string | null;
 }
 
 export default function UserManagementPage() {
@@ -39,7 +40,7 @@ export default function UserManagementPage() {
     username: "",
     password: "",
     displayName: "",
-    role: "viewer",
+    role: "editor",
   });
   const [saving, setSaving] = useState(false);
 
@@ -63,7 +64,7 @@ export default function UserManagementPage() {
 
   const handleAdd = () => {
     setEditUser(null);
-    setForm({ username: "", password: "", displayName: "", role: "viewer" });
+    setForm({ username: "", password: "", displayName: "", role: "editor" });
     setDialogOpen(true);
   };
 
@@ -137,13 +138,11 @@ export default function UserManagementPage() {
   const roleLabels: Record<string, string> = {
     admin: "管理员",
     editor: "编辑者",
-    viewer: "查看者",
   };
 
   const roleColors: Record<string, string> = {
     admin: "bg-purple-100 text-purple-700",
     editor: "bg-blue-100 text-blue-700",
-    viewer: "bg-gray-100 text-gray-700",
   };
 
   if (loading) {
@@ -188,6 +187,9 @@ export default function UserManagementPage() {
                 <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
                   创建时间
                 </th>
+                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                  上次登录
+                </th>
                 <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
                   操作
                 </th>
@@ -225,6 +227,9 @@ export default function UserManagementPage() {
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-500">
                     {user.createdAt?.slice(0, 10)}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-500">
+                    {user.lastLoginAt?.slice(0, 16) || "从未登录"}
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-2">
@@ -304,7 +309,6 @@ export default function UserManagementPage() {
                 onChange={(e) => setForm({ ...form, role: e.target.value })}
                 className="w-full h-10 rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
               >
-                <option value="viewer">查看者 (仅查看)</option>
                 <option value="editor">编辑者 (查看+修改)</option>
                 <option value="admin">管理员 (全部权限)</option>
               </select>

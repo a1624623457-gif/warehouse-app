@@ -114,7 +114,7 @@ export function GlobalSearchBar() {
           onFocus={() => {
             if (results.length > 0) setOpen(true);
           }}
-          placeholder="搜索产品名称、型号..."
+          placeholder="搜索产品名称、类别..."
           className="w-full h-10 pl-10 pr-10 rounded-lg border border-gray-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         />
         {query && (
@@ -159,9 +159,9 @@ export function GlobalSearchBar() {
                   {product.name}
                 </p>
                 <p className="text-xs text-gray-500">
-                  {product.model}
-                  <span className="mx-1">·</span>
                   {product.zoneName}区
+                  <span className="mx-1">·</span>
+                  {product.model || "未分类"}
                 </p>
               </div>
               <span

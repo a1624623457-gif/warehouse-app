@@ -258,7 +258,11 @@ export default function ZoneManagementPage() {
                     <td className="px-6 py-4 text-sm text-gray-500">
                       {zone.name === "临期"
                         ? "根据产品有效期自动归类"
-                        : "根据过期规则自动归类"}
+                        : zone.name === "过期"
+                        ? "根据过期规则自动归类"
+                        : zone.name === "零库存"
+                        ? "库存为0的产品自动归入"
+                        : "系统区域"}
                     </td>
                   </tr>
                 ))}

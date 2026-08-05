@@ -20,8 +20,8 @@ export async function POST(req: NextRequest) {
   }
 
   const role = (session.user as any).role;
-  if (role !== "admin") {
-    return NextResponse.json({ error: "仅管理员可新增区域" }, { status: 403 });
+  if (role !== "admin" && role !== "editor") {
+    return NextResponse.json({ error: "仅管理员和编辑者可新增区域" }, { status: 403 });
   }
 
   const body = await req.json();

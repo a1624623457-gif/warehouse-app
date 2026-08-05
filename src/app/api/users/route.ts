@@ -16,7 +16,7 @@ export async function GET() {
 
   const db = getDb();
   const rows = db.prepare(
-    "SELECT id, username, role, display_name as displayName, is_active as isActive, created_at as createdAt FROM users ORDER BY created_at"
+    "SELECT id, username, role, display_name as displayName, is_active as isActive, created_at as createdAt, last_login_at as lastLoginAt FROM users ORDER BY created_at"
   ).all();
 
   return NextResponse.json(rows);
@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
 
   const result = db.prepare(
     "INSERT INTO users (username, password_hash, role, display_name) VALUES (?, ?, ?, ?)"
-  ).run(body.username.trim(), hash, body.role || "viewer", body.displayName.trim());
+  ).run(body.username.trim(), hash, body.role || "editor", body.displayName.trim());
 
   const user = db.prepare(
     "SELECT id, username, role, display_name as displayName FROM users WHERE id = ?"

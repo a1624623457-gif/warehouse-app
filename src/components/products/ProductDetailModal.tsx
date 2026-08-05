@@ -104,7 +104,7 @@ export function ProductDetailModal({
             {/* Fields */}
             <div className="grid grid-cols-2 gap-4">
               <DetailField label="产品名称" value={product.name} />
-              <DetailField label="型号" value={product.model || "-"} />
+              <DetailField label="产品类别" value={product.model || "-"} />
               <DetailField
                 label="有效期"
                 value={
@@ -126,8 +126,8 @@ export function ProductDetailModal({
                 }
               />
               <DetailField
-                label="单价"
-                value={product.unitPrice != null ? `¥${product.unitPrice}` : "-"}
+                label="成本价"
+                value={isAdmin && product.unitPrice != null ? `¥${product.unitPrice}` : isAdmin ? "-" : "***"}
               />
               <DetailField
                 label="存放区域"

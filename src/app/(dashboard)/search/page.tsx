@@ -154,7 +154,7 @@ function SearchContent() {
               type="text"
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              placeholder="搜索产品名称、型号..."
+              placeholder="搜索产品名称、产品类别..."
               className="w-full h-12 pl-12 pr-4 rounded-lg border border-gray-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               autoFocus
             />
