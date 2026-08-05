@@ -19,16 +19,22 @@ function LoginForm() {
     setError("");
 
     try {
-      await signIn("credentials", {
+      const result = await signIn("credentials", {
         username,
         password,
-        redirect: true,
-        callbackUrl: "/",
+        redirect: false,
       });
-      // signIn with redirect:true doesn't return, page reloads
+
+      if (result?.error) {
+        setError("用户名或密码错误");
+        setLoading(false);
+        return;
+      }
+
+      // Success — redirect manually
+      window.location.href = "/";
     } catch (e) {
       setError("登录失败，请检查网络");
-    } finally {
       setLoading(false);
     }
   };
