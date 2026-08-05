@@ -3,10 +3,6 @@ import bcrypt from "bcryptjs";
 import { getDb } from "@/lib/db";
 import { encode } from "next-auth/jwt";
 
-if (!process.env.AUTH_SECRET) {
-  throw new Error("AUTH_SECRET is not set");
-}
-
 export async function POST(req: NextRequest) {
   try {
     const { username, password } = await req.json();
@@ -34,29 +30,37 @@ export async function POST(req: NextRequest) {
       "UPDATE users SET last_login_at = datetime('now') WHERE id = ?"
     ).run(user.id);
 
-    // Generate JWT token manually
+    const secret = process.env.AUTH_SECRET;
+    if (!secret) {
+      console.error("AUTH_SECRET not set");
+      return NextResponse.json({ error: "服务器配置错误" }, { status: 500 });
+    }
+
+    // Generate JWT token
     const token = await encode({
       token: {
         id: user.id.toString(),
         name: user.display_name,
         username: user.username,
         role: user.role,
+        sub: user.id.toString(),
       },
-      secret: process.env.AUTH_SECRET!,
+      secret,
       salt: "authjs.session-token",
     });
 
-    // Set the session cookie
+    // Determine cookie name based on environment
+    const isProd = req.nextUrl.hostname !== "192.168.5.2" && req.nextUrl.hostname !== "localhost";
+    const cookieName = isProd ? "__Secure-authjs.session-token" : "authjs.session-token";
+
     const response = NextResponse.json({ success: true });
 
-    // Use secure cookie in production
-    const isProd = req.nextUrl.hostname !== "localhost";
-    response.cookies.set("authjs.session-token", token, {
+    response.cookies.set(cookieName, token, {
       httpOnly: true,
       secure: isProd,
       sameSite: "lax",
       path: "/",
-      maxAge: 24 * 60 * 60, // 24 hours
+      maxAge: 24 * 60 * 60,
     });
 
     return response;
