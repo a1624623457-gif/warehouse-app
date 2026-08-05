@@ -34,7 +34,6 @@ function LoginForm() {
         return;
       }
 
-      // Success — hard navigate
       window.location.href = "/";
     } catch (e) {
       setError("登录失败，请检查网络");
@@ -68,8 +67,6 @@ function LoginForm() {
               placeholder="请输入用户名"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              required
-              autoComplete="username"
               onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
             />
           </div>
@@ -82,19 +79,11 @@ function LoginForm() {
               placeholder="请输入密码"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              required
-              autoComplete="current-password"
               onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
             />
           </div>
 
-          <Button
-            type="button"
-            disabled={loading}
-            className="w-full"
-            size="lg"
-            onClick={handleSubmit}
-          >
+          <Button onClick={handleSubmit} disabled={loading} className="w-full" size="lg">
             {loading ? "登录中..." : "登录"}
           </Button>
         </div>
@@ -109,13 +98,11 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="min-h-screen flex items-center justify-center bg-gray-100">
-          <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full" />
-        </div>
-      }
-    >
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full" />
+      </div>
+    }>
       <LoginForm />
     </Suspense>
   );
