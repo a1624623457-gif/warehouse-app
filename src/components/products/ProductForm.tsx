@@ -40,6 +40,7 @@ interface ProductFormProps {
   mode: "add" | "edit";
   lockToken?: number | null;
   onReleaseLock?: () => void;
+  isAdmin?: boolean;
 }
 
 export function ProductForm({
@@ -50,6 +51,7 @@ export function ProductForm({
   mode,
   lockToken,
   onReleaseLock,
+  isAdmin,
 }: ProductFormProps) {
   const [zones, setZones] = useState<Zone[]>([]);
   const [shelves, setShelves] = useState<Shelf[]>([]);
@@ -174,7 +176,7 @@ export function ProductForm({
       const todayIn = form.todayIn ? parseInt(form.todayIn) : 0;
       const todayOut = form.todayOut ? parseInt(form.todayOut) : 0;
 
-      await onSave({
+      const payload: any = {
         ...form,
         imageUrl,
         unitPrice: form.unitPrice ? parseFloat(form.unitPrice) : null,
@@ -184,7 +186,10 @@ export function ProductForm({
         todayIn,
         todayOut,
         specTypeId: form.specTypeId || null,
-      });
+      };
+
+      // Editor role: never send unitPrice so it doesn't get updated
+      await onSave(payload);
 
       showToast(
         mode === "add" ? "产品添加成功" : "产品修改成功",
@@ -300,7 +305,8 @@ export function ProductForm({
               />
             </div>
 
-            {/* Unit price */}
+            {/* Unit price — admin only */}
+            {isAdmin !== false && (
             <div>
               <Label>成本价 (元)</Label>
               <input
@@ -313,6 +319,7 @@ export function ProductForm({
                 className="w-full h-10 rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
+            )}
 
             {/* Zone selector */}
             <div>
