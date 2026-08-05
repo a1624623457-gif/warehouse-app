@@ -215,6 +215,7 @@ function SearchContent() {
         mode={formMode}
         lockToken={lockToken}
         onReleaseLock={handleReleaseLock}
+        isAdmin={isAdmin}
       />
     </div>
   );

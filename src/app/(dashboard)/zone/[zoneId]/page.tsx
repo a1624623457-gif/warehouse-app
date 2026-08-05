@@ -334,6 +334,7 @@ function ZoneProductsContent() {
         mode={formMode}
         lockToken={lockToken}
         onReleaseLock={handleReleaseLock}
+        isAdmin={isAdmin}
       />
     </div>
   );
