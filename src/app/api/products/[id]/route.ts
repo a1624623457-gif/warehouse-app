@@ -48,7 +48,7 @@ export async function PUT(
   const productId = parseInt(id);
   const db = getDb();
 
-  // Check edit lock
+  // Check edit lock — prevent two different users editing the same product
   const existingLock = db.prepare(
     "SELECT * FROM product_edit_locks WHERE product_id = ?"
   ).get(productId) as any;
@@ -62,7 +62,7 @@ export async function PUT(
 
       return NextResponse.json(
         {
-          error: "PRODUCT_LOCKED",
+          error: "产品正在被编辑",
           message: `产品正在由 ${lockedByUser?.display_name || "其他用户"} 编辑中，请稍后再试。`,
           lockedBy: lockedByUser?.display_name || "其他用户",
         },
