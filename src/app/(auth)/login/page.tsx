@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, Suspense } from "react";
+import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,19 +22,19 @@ function LoginForm() {
     setError("");
 
     try {
-      const res = await fetch("/api/auth/custom-signin", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: username.trim(), password }),
+      const result = await signIn("credentials", {
+        username: username.trim(),
+        password,
+        redirect: false,
       });
 
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        setError(data.error || "用户名或密码错误");
+      if (result?.error) {
+        setError("用户名或密码错误");
         setLoading(false);
         return;
       }
 
+      // Success — hard navigate
       window.location.href = "/";
     } catch (e) {
       setError("登录失败，请检查网络");
