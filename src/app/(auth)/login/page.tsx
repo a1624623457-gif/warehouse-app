@@ -35,7 +35,8 @@ function LoginForm() {
         return;
       }
 
-      // Success — redirect manually
+      // Force hard navigation so middleware picks up the new cookie
+      await fetch("/api/auth/session");
       window.location.href = "/";
     } catch (e) {
       setError("登录失败，请检查网络");
