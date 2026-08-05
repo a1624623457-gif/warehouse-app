@@ -50,8 +50,7 @@ function LoginForm() {
           <p className="text-gray-500 mt-1">仓库库存管理系统</p>
         </div>
 
-        <form
-          onSubmit={handleSubmit}
+        <div
           className="bg-white rounded-xl shadow-sm p-8 space-y-5"
         >
           {error && (
@@ -94,7 +93,7 @@ function LoginForm() {
           >
             {loading ? "登录中..." : "登录"}
           </Button>
-        </form>
+        </div>
 
         <p className="text-center text-xs text-gray-400 mt-6">
           库存助手 &copy; {new Date().getFullYear()}
