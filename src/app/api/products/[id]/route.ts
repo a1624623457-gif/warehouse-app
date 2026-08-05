@@ -104,9 +104,6 @@ export async function PUT(
     }
   }
 
-  // Yesterday stock: if yesterday_stock is provided, use it; otherwise keep old value
-  const yesterdayStock = body.yesterdayStock !== undefined ? body.yesterdayStock : oldProduct.yesterday_stock;
-
   db.prepare(`
     UPDATE products SET
       name = ?,
@@ -120,7 +117,6 @@ export async function PUT(
       today_in = ?,
       today_out = ?,
       current_stock = ?,
-      yesterday_stock = ?,
       notes = ?,
       updated_by = ?,
       updated_at = datetime('now')
@@ -137,7 +133,6 @@ export async function PUT(
     newTodayIn,
     newTodayOut,
     newStock,
-    yesterdayStock,
     body.notes !== undefined ? body.notes : oldProduct.notes,
     userId,
     productId

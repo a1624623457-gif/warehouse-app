@@ -14,7 +14,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/toast";
-import { Plus, Pencil, Trash2, Lock, Globe, AlertTriangle, Clock } from "lucide-react";
+import { Plus, Pencil, Trash2, Lock, Globe, AlertTriangle, Clock, ChevronUp, ChevronDown } from "lucide-react";
 
 interface Zone {
   id: number;
@@ -120,6 +120,25 @@ export default function ZoneManagementPage() {
     }
   };
 
+  const handleMove = async (zone: Zone, direction: "up" | "down") => {
+    try {
+      const res = await fetch("/api/zones/reorder", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ zoneId: zone.id, direction }),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        showToast(err.error || "移动失败", "error");
+        return;
+      }
+      const data = await res.json();
+      setZones(data);
+    } catch (e: any) {
+      showToast("移动失败", "error");
+    }
+  };
+
   const realZones = zones.filter((z) => !z.isVirtual);
   const virtualZones = zones.filter((z) => z.isVirtual);
 
@@ -163,6 +182,9 @@ export default function ZoneManagementPage() {
                 <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
                   排序
                 </th>
+                <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase">
+                  顺序
+                </th>
                 <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase">
                   操作
                 </th>
@@ -193,6 +215,24 @@ export default function ZoneManagementPage() {
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-500">
                     {zone.sortOrder}
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => handleMove(zone, "up")}
+                        className="p-1 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded"
+                        title="上移"
+                      >
+                        <ChevronUp size={16} />
+                      </button>
+                      <button
+                        onClick={() => handleMove(zone, "down")}
+                        className="p-1 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded"
+                        title="下移"
+                      >
+                        <ChevronDown size={16} />
+                      </button>
+                    </div>
                   </td>
                   <td className="px-6 py-4 text-right">
                     {!zone.isFixed && (
