@@ -53,16 +53,27 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const handleExportExcel = async () => {
     try {
       const res = await fetch("/api/export-excel");
-      if (!res.ok) return;
+      if (!res.ok) {
+        console.error("导出失败", res.status);
+        return;
+      }
       const blob = await res.blob();
+      if (blob.size === 0) {
+        console.error("导出文件为空");
+        return;
+      }
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `warehouse-export-${new Date().toISOString().slice(0, 10)}.xlsx`;
+      const filename = `warehouse-export-${new Date().toISOString().slice(0, 10)}.xlsx`;
+      a.download = filename;
+      a.style.display = "none";
       document.body.appendChild(a);
       a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, 100);
     } catch (e) {
       console.error("下载失败", e);
     }
