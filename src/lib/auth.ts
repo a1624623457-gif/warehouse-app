@@ -29,11 +29,18 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
         if (!isValid) return null;
 
+        // Generate a fresh session token — this invalidates any existing session
+        const sessionToken = `sess_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+        db.prepare(
+          "UPDATE users SET last_login_at = datetime('now'), session_token = ? WHERE id = ?"
+        ).run(sessionToken, user.id);
+
         return {
           id: user.id.toString(),
           name: user.display_name,
           username: user.username,
           role: user.role,
+          sessionToken,
         };
       },
     }),
@@ -44,14 +51,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.id = user.id;
         token.username = (user as any).username;
         token.role = (user as any).role;
-
-        // Update last login time and generate a session token for single-device enforcement
-        const db = getDb();
-        const sessionToken = `sess_${Date.now()}_${Math.random().toString(36).slice(2)}`;
-        db.prepare(
-          "UPDATE users SET last_login_at = datetime('now'), last_login_ip = ?, session_token = ? WHERE id = ?"
-        ).run(null, sessionToken, user.id);
-        token.sessionToken = sessionToken;
+        token.sessionToken = (user as any).sessionToken;
       }
       return token;
     },
@@ -61,6 +61,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         (session.user as any).username = token.username;
         (session.user as any).role = token.role;
         (session.user as any).sessionToken = token.sessionToken;
+
+        // Validate the session token matches what's in the database
+        const db = getDb();
+        const dbUser = db.prepare("SELECT session_token FROM users WHERE id = ?").get(parseInt(token.id as string)) as any;
+        if (dbUser && token.sessionToken !== dbUser.session_token) {
+          // Session was invalidated by a newer login — return minimal session
+          return {} as any;
+        }
       }
       return session;
     },
