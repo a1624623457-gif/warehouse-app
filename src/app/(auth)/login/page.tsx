@@ -13,16 +13,20 @@ function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     setLoading(true);
     setError("");
 
     try {
+      // Get CSRF token first
+      const csrfRes = await fetch("/api/auth/csrf");
+      const csrfData = await csrfRes.json();
+
       const result = await signIn("credentials", {
         username,
         password,
         redirect: false,
+        csrfToken: csrfData.csrfToken,
       });
 
       if (result?.error) {
@@ -86,10 +90,11 @@ function LoginForm() {
           </div>
 
           <Button
-            type="submit"
+            type="button"
             disabled={loading}
             className="w-full"
             size="lg"
+            onClick={handleSubmit}
           >
             {loading ? "登录中..." : "登录"}
           </Button>
