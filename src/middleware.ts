@@ -5,9 +5,10 @@ export function middleware(req: NextRequest) {
   const isLoggedIn = req.cookies.has("authjs.session-token") || req.cookies.has("__Secure-authjs.session-token");
   const isAuthPage = req.nextUrl.pathname.startsWith("/login");
   const isApi = req.nextUrl.pathname.startsWith("/api/");
+  const isCustomSignin = req.nextUrl.pathname.startsWith("/api/auth/custom-signin");
   const isStatic = req.nextUrl.pathname.startsWith("/_next") || req.nextUrl.pathname.startsWith("/favicon.ico") || req.nextUrl.pathname.startsWith("/uploads");
 
-  if (isStatic || isApi) {
+  if (isStatic || isCustomSignin) {
     return NextResponse.next();
   }
 
