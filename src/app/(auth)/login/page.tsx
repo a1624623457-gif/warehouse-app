@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, Suspense } from "react";
-import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,29 +13,27 @@ function LoginForm() {
   const [error, setError] = useState("");
 
   const handleSubmit = async () => {
+    if (!username.trim() || !password.trim()) {
+      setError("请输入用户名和密码");
+      return;
+    }
     setLoading(true);
     setError("");
 
     try {
-      // Get CSRF token first
-      const csrfRes = await fetch("/api/auth/csrf");
-      const csrfData = await csrfRes.json();
-
-      const result = await signIn("credentials", {
-        username,
-        password,
-        redirect: false,
-        csrfToken: csrfData.csrfToken,
+      const res = await fetch("/api/auth/custom-signin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: username.trim(), password }),
       });
 
-      if (result?.error) {
-        setError("用户名或密码错误");
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setError(data.error || "用户名或密码错误");
         setLoading(false);
         return;
       }
 
-      // Force hard navigation so middleware picks up the new cookie
-      await fetch("/api/auth/session");
       window.location.href = "/";
     } catch (e) {
       setError("登录失败，请检查网络");
@@ -55,9 +52,7 @@ function LoginForm() {
           <p className="text-gray-500 mt-1">仓库库存管理系统</p>
         </div>
 
-        <div
-          className="bg-white rounded-xl shadow-sm p-8 space-y-5"
-        >
+        <div className="bg-white rounded-xl shadow-sm p-8 space-y-5">
           {error && (
             <div className="bg-red-50 text-red-600 text-sm p-3 rounded-lg text-center">
               {error}
@@ -74,6 +69,7 @@ function LoginForm() {
               onChange={(e) => setUsername(e.target.value)}
               required
               autoComplete="username"
+              onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
             />
           </div>
 
@@ -87,6 +83,7 @@ function LoginForm() {
               onChange={(e) => setPassword(e.target.value)}
               required
               autoComplete="current-password"
+              onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
             />
           </div>
 
