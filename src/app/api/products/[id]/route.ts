@@ -89,20 +89,23 @@ export async function PUT(
   const newStock = oldProduct.current_stock + addIn - addOut;
 
   // Resolve shelf: if shelfName is provided, find existing or create new
-  let shelfId = body.shelfId !== undefined ? body.shelfId : oldProduct.shelf_id;
+  let shelfId = (body.shelfId != null && body.shelfId !== "") ? body.shelfId : oldProduct.shelf_id;
   if (body.shelfName) {
+    const zoneForShelf = body.zoneId != null && body.zoneId !== "" ? body.zoneId : oldProduct.zone_id;
     const existingShelf = db.prepare(
       "SELECT id FROM shelves WHERE name = ? AND zone_id = ?"
-    ).get(body.shelfName, body.zoneId ?? oldProduct.zone_id) as any;
+    ).get(body.shelfName, zoneForShelf) as any;
     if (existingShelf) {
       shelfId = existingShelf.id;
     } else {
       const result = db.prepare(
         "INSERT INTO shelves (name, zone_id) VALUES (?, ?)"
-      ).run(body.shelfName, body.zoneId ?? oldProduct.zone_id);
+      ).run(body.shelfName, zoneForShelf);
       shelfId = result.lastInsertRowid;
     }
   }
+
+  const zoneId = (body.zoneId != null && body.zoneId !== "" && !isNaN(body.zoneId)) ? body.zoneId : oldProduct.zone_id;
 
   db.prepare(`
     UPDATE products SET
@@ -128,7 +131,7 @@ export async function PUT(
     body.imageUrl !== undefined ? body.imageUrl : oldProduct.image_url,
     body.expiryDate !== undefined ? body.expiryDate : oldProduct.expiry_date,
     body.unitPrice !== undefined ? body.unitPrice : oldProduct.unit_price,
-    body.zoneId ?? oldProduct.zone_id,
+    zoneId,
     shelfId,
     newTodayIn,
     newTodayOut,

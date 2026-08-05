@@ -170,14 +170,19 @@ export function ProductForm({
         imageUrl = await uploadImage(imageFile);
       }
 
+      const zoneIdInt = form.zoneId ? parseInt(form.zoneId) : "";
+      const todayIn = form.todayIn ? parseInt(form.todayIn) : 0;
+      const todayOut = form.todayOut ? parseInt(form.todayOut) : 0;
+
       await onSave({
         ...form,
         imageUrl,
         unitPrice: form.unitPrice ? parseFloat(form.unitPrice) : null,
-        zoneId: parseInt(form.zoneId),
+        zoneId: zoneIdInt,
+        shelfId: form.shelfId || null,
         shelfName: shelfInputValue.trim() || null,
-        todayIn: parseInt(form.todayIn) || 0,
-        todayOut: parseInt(form.todayOut) || 0,
+        todayIn,
+        todayOut,
         specTypeId: form.specTypeId || null,
       });
 
