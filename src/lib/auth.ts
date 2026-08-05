@@ -90,6 +90,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         secure: false,
       },
     },
+    csrfToken: {
+      name: "authjs.csrf-token",
+      options: {
+        httpOnly: false,
+        sameSite: "lax",
+        path: "/",
+        secure: false,
+      },
+    },
   },
   trustHost: true,
 });
