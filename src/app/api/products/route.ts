@@ -119,9 +119,11 @@ export async function POST(req: NextRequest) {
   }
 
   const role = (session.user as any).role;
-  if (role !== "admin") {
-    return NextResponse.json({ error: "仅管理员可新增产品" }, { status: 403 });
+  if (role !== "admin" && role !== "editor") {
+    return NextResponse.json({ error: "无权限" }, { status: 403 });
   }
+
+  const isEditor = role === "editor";
 
   const body = await req.json();
   const userId = parseInt((session.user as any).id);

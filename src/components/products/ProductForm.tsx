@@ -305,8 +305,8 @@ export function ProductForm({
               />
             </div>
 
-            {/* Unit price — admin only */}
-            {isAdmin !== false && (
+            {/* Unit price — always shown during add, hidden during edit for non-admin */}
+            {(isAdmin !== false || mode === "add") && (
             <div>
               <Label>成本价 (元)</Label>
               <input
